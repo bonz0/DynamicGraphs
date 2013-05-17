@@ -1,8 +1,11 @@
 package utils;
 
+import graph.Region;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Utils {
 	public static String readInputFile(String inputFile) {
@@ -48,5 +51,14 @@ public class Utils {
 			}
 		}
 		return maxNodeNumber + 1;
+	}
+	
+	public static void printRegionsList(ArrayList<ArrayList<Region>> regions) {
+		for(int iii = 0; iii < regions.size(); iii++) {
+			ArrayList<Region> currentTimeRegions = regions.get(iii);
+			for(int jjj = 0; jjj < currentTimeRegions.size(); jjj++) {
+				System.out.println(currentTimeRegions.get(jjj));
+			}
+		}
 	}
 }

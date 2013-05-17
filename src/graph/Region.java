@@ -15,4 +15,17 @@ public class Region {
 		currentRegion++;
 		this.regionNumber = currentRegion;
 	}
+	
+	@Override
+	public String toString() {
+		String returnString = "{";
+		for(int iii = 0; iii < this.nodes.size(); iii++) {
+			returnString += Integer.toString((nodes.get(iii)));
+			if(iii != this.nodes.size() - 1) {
+				returnString += ", ";
+			}
+		}
+		returnString += "}";
+		return returnString;
+	}
 }
