@@ -42,6 +42,10 @@ public class DynamicGraph {
 		return this.adjacencyMatrix[row][column].get(time);
 	}
 	
+	public int getNumberOfTimeSlots() {
+		return this.numberOfTimeSlots;
+	}
+	
 	private List<Integer> getNeighborsAtTime(int currentPoint, int timeSlot) {
 		List<Integer> neighbors = new ArrayList<Integer>();
 		for(int iii = 0; iii < this.adjacencyMatrix.length; iii++) {
@@ -52,7 +56,7 @@ public class DynamicGraph {
 		return neighbors;
 	}
 	
-	public List<Region> getRegionsAtTime(int timeSlot) {
+	private List<Region> getRegionsAtTime(int timeSlot) {
 		boolean[] visited = new boolean[this.numberOfNodes];
 		Queue<Integer> nodeQueue = new LinkedList<Integer>();
 		List<Region> regions = new ArrayList<Region>();
@@ -72,6 +76,14 @@ public class DynamicGraph {
 			}
 		}
 		return regions;
+	}
+	
+	public List<List<Region>> getAllRegions() {
+		List<List<Region>> timeRegions = new ArrayList<List<Region>>();
+		for(int iii = 0; iii < this.getNumberOfTimeSlots(); iii++) {
+			timeRegions.add(this.getRegionsAtTime(iii));
+		}
+		return timeRegions;
 	}
 	
 	@Override
