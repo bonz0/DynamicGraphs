@@ -56,8 +56,8 @@ public class DynamicGraph {
 		boolean[] visited = new boolean[this.numberOfNodes];
 		Queue<Integer> nodeQueue = new LinkedList<Integer>();
 		List<Region> regions = new ArrayList<Region>();
-		for(int iii = 0; iii < this.adjacencyMatrix.length; iii++) {		// for point in all points
-			if(!visited[iii]) {													// if point not visited
+		for(int iii = 0; iii < this.adjacencyMatrix.length; iii++) {
+			if(!visited[iii]) {
 				Region currentRegion = new Region();
 				currentRegion.nodes.add(iii);
 				visited[iii] = true;
@@ -71,18 +71,6 @@ public class DynamicGraph {
 				regions.add(currentRegion);
 			}
 		}
-
-
-				// create new region
-				// insert point in region
-				// mark point as visited
-				// insert point in queue
-				// while point queue is not empty
-					// dequeue current point
-						// get current point's neighbors
-						// insert neighbors in point queue
-						// insert neighbors in region
-			
 		return regions;
 	}
 	
