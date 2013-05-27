@@ -5,6 +5,7 @@ import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.lang.instrument.Instrumentation;
 
 import graph.*;
 import utils.Utils;
@@ -16,15 +17,15 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		long startTime = System.currentTimeMillis();
-		final String inputFileName = "/home/farhang/Downloads/pruned_datasets/enron.txt.sorted.processed.new";
-		final String outputFileName = "/home/farhang/Downloads/pruned_datasets/enron.regions1";
+		final String inputFileName = "/home/farhang/Downloads/pruned_datasets/dblp.txt.sorted.processed.new";
+		final String outputFileName = "/home/farhang/Downloads/pruned_datasets/dblp.regions";
 		ArrayList<int[]> inputGraph = Utils.readParseInputFile(inputFileName);
 		System.out.println("Input file: " + inputFileName + " read!");
 		System.out.println("File parsed!");
 		System.gc();
 		DynamicGraph myGraph = new DynamicGraph(inputGraph, Utils.getNumberOfNodes(inputGraph));
 		System.out.println("Graph populated");
-		List<StableRegions> regions = myGraph.getStableRegions(0.01, 0.4);
+		List<StableRegions> regions = myGraph.getStableRegions(0.1, 0.3);
 		System.out.println("Done!!!!!! " + regions.size());
 		for(StableRegions temp: regions) {
 			System.out.println(temp.toString());

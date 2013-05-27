@@ -17,6 +17,7 @@ public class DynamicGraph {
 	
 	public DynamicGraph(int numberOfNodes, int numberOfTimeSlots) {
 		this.numberOfNodes = numberOfNodes;
+		System.out.println("nodes: " + this.numberOfNodes);
 		this.numberOfTimeSlots = numberOfTimeSlots;
 		this.adjacencyMatrix = new BitSet[this.numberOfNodes][this.numberOfNodes];
 		for(int iii = 0; iii < this.numberOfNodes; iii++) {
@@ -36,6 +37,7 @@ public class DynamicGraph {
 	
 	public DynamicGraph(List<int[]> inputGraph, int numberOfNodes) {
 		this(numberOfNodes, (inputGraph.get(inputGraph.size() - 1)[2] + 1));
+		System.out.println();
 		for(int iii = 0; iii < inputGraph.size(); iii++) {
 			this.setBitAt(inputGraph.get(iii)[0], inputGraph.get(iii)[1], inputGraph.get(iii)[2]);
 			this.setBitAt(inputGraph.get(iii)[1], inputGraph.get(iii)[0], inputGraph.get(iii)[2]);
