@@ -89,7 +89,7 @@ public class DynamicGraph {
 						}
 					}
 				}
-				regions.add(currentRegion);
+				if(currentRegion.nodes.size() > 1) regions.add(currentRegion);
 			}
 		}
 		return regions;
@@ -98,7 +98,8 @@ public class DynamicGraph {
 	public List<List<Region>> getAllRegions() {
 		List<List<Region>> timeRegions = new ArrayList<List<Region>>();
 		for(int iii = 0; iii < this.getNumberOfTimeSlots(); iii++) {
-			timeRegions.add(this.getRegionsAtTime(iii));
+			List<Region> currentList = this.getRegionsAtTime(iii);	
+			timeRegions.add(currentList);
 		}
 		return timeRegions;
 	}
@@ -135,7 +136,7 @@ public class DynamicGraph {
 				if(!timeList.get(jjj).visited) {
 					StableRegions currentStableRegion = new StableRegions();
 					timeList.get(jjj).visited = true;
-					currentStableRegion.stableRegions.add(timeList.get(jjj));
+					currentStableRegion.stableRegions.offer(timeList.get(jjj));
 					getNextSimilarRegion(currentStableRegion, regions, iii + 1, similarity);
 					if(currentStableRegion.stableRegions.size() >= minTimeSlots) allRegions.add(currentStableRegion);
 				}
@@ -152,13 +153,13 @@ public class DynamicGraph {
 			List<Region> currentList = list.get(iii);
 			for(int jjj = 0; jjj < currentList.size(); jjj++) {
 				if(!currentList.get(jjj).visited) {
-					double thisSimilarity = thisRegion.getSimilarity(currentList.get(iii));
+					double thisSimilarity = thisRegion.getSimilarity(currentList.get(jjj));
 					maxIndex = (thisSimilarity >= maxSimilarity) ? jjj : maxIndex;
 					maxSimilarity = (thisSimilarity >= maxSimilarity) ? thisSimilarity : maxSimilarity;
 				}
 			}
 			if(maxSimilarity >= similarity) {
-				currentRegions.stableRegions.add(list.get(iii).get(maxIndex));
+				currentRegions.stableRegions.offer(currentList.get(maxIndex));
 				list.get(iii).get(maxIndex).visited = true;
 			} else {
 				break;
