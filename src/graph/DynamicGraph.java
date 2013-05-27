@@ -1,10 +1,14 @@
 package graph;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import graph.StableRegions;
 
 public class DynamicGraph {
 	int numberOfNodes;
@@ -27,6 +31,14 @@ public class DynamicGraph {
 		for(int iii = 0; iii < inputGraphArray.length; iii++) {
 			this.setBitAt(inputGraphArray[iii][0], inputGraphArray[iii][1], inputGraphArray[iii][2]);
 			this.setBitAt(inputGraphArray[iii][1], inputGraphArray[iii][0], inputGraphArray[iii][2]);
+		}
+	}
+	
+	public DynamicGraph(List<int[]> inputGraph, int numberOfNodes) {
+		this(numberOfNodes, (inputGraph.get(inputGraph.size() - 1)[2] + 1));
+		for(int iii = 0; iii < inputGraph.size(); iii++) {
+			this.setBitAt(inputGraph.get(iii)[0], inputGraph.get(iii)[1], inputGraph.get(iii)[2]);
+			this.setBitAt(inputGraph.get(iii)[1], inputGraph.get(iii)[0], inputGraph.get(iii)[2]);
 		}
 	}
 
@@ -62,15 +74,20 @@ public class DynamicGraph {
 		List<Region> regions = new ArrayList<Region>();
 		for(int iii = 0; iii < this.adjacencyMatrix.length; iii++) {
 			if(!visited[iii]) {
-				Region currentRegion = new Region();
+				Region currentRegion = new Region(timeSlot);
 				currentRegion.nodes.add(iii);
 				visited[iii] = true;
 				nodeQueue.add(iii);
 				while(!nodeQueue.isEmpty()) {
 					Integer currentPoint = nodeQueue.poll();
+					visited[currentPoint] = true;
 					List<Integer> neighbors = this.getNeighborsAtTime(currentPoint, timeSlot);
-					nodeQueue.addAll(neighbors);
-					currentRegion.nodes.addAll(neighbors);
+					for(Integer temp : neighbors) {
+						if(!visited[temp]) {
+							nodeQueue.add(temp);
+							currentRegion.nodes.add(temp);
+						}
+					}
 				}
 				regions.add(currentRegion);
 			}
@@ -84,6 +101,82 @@ public class DynamicGraph {
 			timeRegions.add(this.getRegionsAtTime(iii));
 		}
 		return timeRegions;
+	}
+	
+	public void printEdges(String fileName) {
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter(fileName));
+			for(int iii = 0; iii < this.adjacencyMatrix.length; iii++) {
+				for(int jjj = 0; jjj < this.adjacencyMatrix[iii].length; jjj++) {
+					bw.write(this.adjacencyMatrix[iii][jjj].toString().replaceAll("[,{}]", "") + "\n");
+				}
+			}
+		} catch (IOException e) {
+			System.out.println("Unable to write to file: " + fileName + "!");
+			e.printStackTrace();
+			System.exit(-1);
+		} finally {
+			try {
+				if(bw != null) bw.close();
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public List<StableRegions> getStableRegions(double percentage, double similarity) {
+		List<List<Region>> regions = this.getAllRegions();
+		int minTimeSlots = (int) ((int) this.numberOfTimeSlots * percentage);
+		ArrayList<StableRegions> allRegions = new ArrayList<StableRegions>();
+		for(int iii = 0; iii < regions.size() - 1; iii++) {
+			List<Region> timeList = regions.get(iii);
+			for(int jjj = 0; jjj < timeList.size(); jjj++) {
+				if(!timeList.get(jjj).visited) {
+					StableRegions currentStableRegion = new StableRegions();
+					timeList.get(jjj).visited = true;
+					currentStableRegion.stableRegions.add(timeList.get(jjj));
+					getNextSimilarRegion(currentStableRegion.stableRegions, regions, iii + 1, similarity);
+					if(currentStableRegion.stableRegions.size() >= minTimeSlots) allRegions.add(currentStableRegion);
+				}
+			}
+		}
+		return allRegions;
+	}
+	
+	private static void getNextSimilarRegion(Queue<Region> currentRegions, List<List<Region>> list, int index, double similarity) {
+		for(int iii = index; iii < list.size(); iii++) {
+			Region thisRegion = currentRegions.peek();
+			double maxSimilarity = Double.MIN_VALUE;
+			int maxIndex = 0;
+			List<Region> currentList = list.get(iii);
+			for(int jjj = 0; jjj < currentList.size(); jjj++) {
+				if(!currentList.get(jjj).visited) {
+					double thisSimilarity = thisRegion.getSimilarity(currentList.get(iii));
+					maxIndex = (thisSimilarity >= maxSimilarity) ? jjj : maxIndex;
+					maxSimilarity = (thisSimilarity >= maxSimilarity) ? thisSimilarity : maxSimilarity;
+				}
+			}
+			if(maxSimilarity >= similarity) {
+				currentRegions.add(list.get(iii).get(maxIndex));
+				list.get(iii).get(maxIndex).visited = true;
+			} else {
+				break;
+			}
+		}
+	}
+	
+	private static Region getNextSimilarRegion(Region currentRegion, List<Region> nextList, double similarity) {
+		double maxSimilarity = Double.MIN_VALUE;
+		int maxIndex = 0;
+		for(int iii = 0; iii < nextList.size(); iii++) {
+			if(!nextList.get(iii).visited) {
+				double thisSimilarity = currentRegion.getSimilarity(nextList.get(iii));
+				maxIndex = (thisSimilarity >= maxSimilarity) ? iii : maxIndex;
+				maxSimilarity = (thisSimilarity >= maxSimilarity) ? thisSimilarity : maxSimilarity;
+			}
+		}
+		return (maxSimilarity >= similarity) ? nextList.get(maxIndex) : null;
 	}
 	
 	@Override
