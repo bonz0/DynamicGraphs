@@ -136,7 +136,7 @@ public class DynamicGraph {
 					StableRegions currentStableRegion = new StableRegions();
 					timeList.get(jjj).visited = true;
 					currentStableRegion.stableRegions.add(timeList.get(jjj));
-					getNextSimilarRegion(currentStableRegion.stableRegions, regions, iii + 1, similarity);
+					getNextSimilarRegion(currentStableRegion, regions, iii + 1, similarity);
 					if(currentStableRegion.stableRegions.size() >= minTimeSlots) allRegions.add(currentStableRegion);
 				}
 			}
@@ -144,9 +144,9 @@ public class DynamicGraph {
 		return allRegions;
 	}
 	
-	private static void getNextSimilarRegion(Queue<Region> currentRegions, List<List<Region>> list, int index, double similarity) {
+	private static void getNextSimilarRegion(StableRegions currentRegions, List<List<Region>> list, int index, double similarity) {
 		for(int iii = index; iii < list.size(); iii++) {
-			Region thisRegion = currentRegions.peek();
+			Region thisRegion = currentRegions.stableRegions.peek();
 			double maxSimilarity = Double.MIN_VALUE;
 			int maxIndex = 0;
 			List<Region> currentList = list.get(iii);
@@ -158,7 +158,7 @@ public class DynamicGraph {
 				}
 			}
 			if(maxSimilarity >= similarity) {
-				currentRegions.add(list.get(iii).get(maxIndex));
+				currentRegions.stableRegions.add(list.get(iii).get(maxIndex));
 				list.get(iii).get(maxIndex).visited = true;
 			} else {
 				break;
